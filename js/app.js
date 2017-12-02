@@ -17,17 +17,9 @@ nameField.setAttribute("onfocusout", "validateName()");
 
 function validateName() {
   let nameValue = nameField.value;
-  var nameFeedback = document.getElementsByClassName("form-error-name");
-  if (nameFeedback.length > 0) {
-    nameFeedback[0].parentNode.removeChild(nameFeedback[0]);
-  };
+  removeExistingErrors('form-error-name');
   if (nameValue === '') {
-    let nameFieldError = document.createElement('div');
-    nameFieldError.classList.add('form-error', 'form-error-name');
-    nameFieldError.textContent = 'Please add a name.'
-    nameField.parentNode.insertBefore(nameFieldError, nameField);
-    nameField.classList.add("error");
-    validationErrors += 1;
+    createErrorElement('form-error', 'form-error-name','Please add a name.', nameField, true)
   } else {
     nameField.classList.remove("error");
   };
@@ -45,26 +37,13 @@ emailField.setAttribute("onfocusout", "validateEmail()");
 function validateEmail() {
   var email = emailField.value;
   var testterms = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  var emailFeedback = document.getElementsByClassName("form-error-email");
-  if (emailFeedback.length > 0) {
-    emailFeedback[0].parentNode.removeChild(emailFeedback[0]);
-  };
+  removeExistingErrors('form-error-email');
   if (testterms.test(email)) {
     emailField.classList.remove("error");
   } else if (email === ''){
-    validationErrors += 1
-    emailField.classList.add("error");
-    let emailFieldError = document.createElement('div');
-    emailFieldError.classList.add('form-error', 'form-error-email');
-    emailFieldError.textContent = 'Please add your email.'
-    emailField.parentNode.insertBefore(emailFieldError, emailField);
+    createErrorElement('form-error','form-error-email','Please add your email.', emailField, true)
   } else {
-    validationErrors += 1
-    emailField.classList.add("error");
-    let emailFieldError = document.createElement('div');
-    emailFieldError.classList.add('form-error', 'form-error-email');
-    emailFieldError.textContent = 'Please enter a valid email.'
-    emailField.parentNode.insertBefore(emailFieldError, emailField);
+    createErrorElement('form-error','form-error-email','Please enter a valid email.', emailField, true)
   };
 };
 
@@ -81,12 +60,12 @@ const jobFields = document.getElementById('title');
 jobFields.setAttribute("onchange", "onJobSelection()");
 
 // Helper functions to hide and show "other" field
-var hideJobOtherField = () => otherFieldContainer.style.display = "none";
-var showJobOtherField = () => otherFieldContainer.style.display = "block";
+const hideJobOtherField = () => otherFieldContainer.style.display = "none";
+const showJobOtherField = () => otherFieldContainer.style.display = "block";
 
 // Make "other" field appear if "other is selected"
 function onJobSelection() {
-  let selectedJobValue = jobFields.options[jobFields.selectedIndex].value;
+  const selectedJobValue = jobFields.options[jobFields.selectedIndex].value;
   if (selectedJobValue === "other") {
     showJobOtherField();
   } else {
@@ -95,22 +74,12 @@ function onJobSelection() {
   }
 };
 
-// When leaving the focus of the "other" field or
-// when submitting the form
-// if "other" is selected, make sure they've added a job role
+// If "other" is selected, make sure they've added a job role
 function validateJobRole() {
-  var jobFeedback = document.getElementsByClassName("form-error-job");
-  if (jobFeedback.length > 0) {
-    jobFeedback[0].parentNode.removeChild(jobFeedback[0]);
-  };
-  let finalJobValue = jobFields.options[jobFields.selectedIndex].value;
+  removeExistingErrors('form-error-job');
+  const finalJobValue = jobFields.options[jobFields.selectedIndex].value;
   if (finalJobValue === "other" && otherField.value === '') {
-    validationErrors += 1;
-    let otherFieldError = document.createElement('div');
-    otherFieldError.classList.add('form-error', 'form-error-job');
-    otherFieldError.textContent = 'Please add your role.'
-    otherField.parentNode.insertBefore(otherFieldError, otherField);
-    otherField.classList.add("error");
+    createErrorElement('form-error', 'form-error-job','Please add your role.', otherField, true)
   } else {
     otherField.classList.remove("error");
   }
@@ -126,17 +95,15 @@ shirtChoice.setAttribute("onchange", "onShirtDesignSelection()");
 
 // Helpers for hiding or showing shirt colors
 const shirtColor = document.getElementById('colors-js-puns');
-var hideShirtColors = () => shirtColor.style.display = "none";
-var showShirtColors = () => shirtColor.style.display = "block";
+const hideShirtColors = () => shirtColor.style.display = "none";
+const showShirtColors = () => shirtColor.style.display = "block";
 
 const shirtTitle = document.getElementsByClassName('shirt')[0].nextSibling;
-console.log(shirtTitle);
 
-// Show color choices only if the design is selected
 // When design is selected, show relevant color choices
 function onShirtDesignSelection() {
-  let selectedDesignIndex = shirtChoice.selectedIndex;
-  let colorChoices = document.getElementById('color');
+  const selectedDesignIndex = shirtChoice.selectedIndex;
+  const colorChoices = document.getElementById('color');
   let colorChoicesHTML;
   if (selectedDesignIndex === 0) {
     hideShirtColors();
@@ -155,18 +122,10 @@ function onShirtDesignSelection() {
 };
 
 function validateShirt() {
-  var shirtFeedback = document.getElementsByClassName("form-error-shirt");
-  if (shirtFeedback.length > 0) {
-    shirtFeedback[0].parentNode.removeChild(shirtFeedback[0]);
-  };
-  let selectedDesignIndex = shirtChoice.selectedIndex;
+  removeExistingErrors('form-error-shirt');
+  const selectedDesignIndex = shirtChoice.selectedIndex;
   if (selectedDesignIndex === 0) {
-    validationErrors += 1;
-    let shirtError = document.createElement('div');
-    shirtError.classList.add('form-error-cc', 'form-error-shirt');
-    shirtError.textContent = 'Please select a shirt design.';
-    shirtChoice.parentNode.insertBefore(shirtError, shirtChoice.nextSibling);
-  } else {
+    createErrorElement('form-error-cc', 'form-error-shirt','Please select a shirt design.', shirtChoice, false);
   };
 };
 
@@ -177,7 +136,7 @@ function validateShirt() {
 // Adds javascript action for activity selection
 const activityFieldSet = document.getElementsByClassName('activities')[0];
 const activityCheckboxes = activityFieldSet.getElementsByTagName('input');
-for(var i=0; i< activityCheckboxes.length; i++) {
+for(let i=0; i< activityCheckboxes.length; i++) {
   activityCheckboxes[i].setAttribute("onchange", `onActivitySelection(this,${i})`);
 };
 const activityTitle = activityFieldSet.getElementsByTagName('legend')[0];
@@ -238,12 +197,9 @@ function setCostTotal() {
 
 // Makes sure at least one activity is selected
 function validateActivities() {
-  if (costTotal > 0) {
-    activityTitle.innerHTML = 'Register for Activities';
-    return;
-  } else {
-    validationErrors += 1;
-    activityTitle.innerHTML = 'Register for Activities <br/><div class="form-error-activities">You must select at least one activity.</div>';
+  removeExistingErrors('form-error-activities');
+  if (costTotal === 0) {
+    createErrorElement('form-error-activities','none','You must select at least one activity.', activityTitle, false);
   };
 };
 
@@ -255,42 +211,46 @@ function validateActivities() {
 const paymentChoice = document.getElementById('payment');
 paymentChoice.setAttribute("onchange", "onPaymentSelection()");
 
-// show/hide credit card info
+// Collect divs of payment information
 const creditCardInfo = document.getElementById('credit-card');
-var hideCreditCardInfo = () => creditCardInfo.style.display = "none";
-var showCreditCardInfo = () => creditCardInfo.style.display = "block";
-
-// show/hide bitcoin info
 const bitcoinInfo = document.getElementById('bitcoin-info');
-var hideBitcoinInfo = () => bitcoinInfo.style.display = "none";
-var showBitcoinInfo = () => bitcoinInfo.style.display = "block";
-
-// show/hide paypal info
 const paypalInfo = document.getElementById('paypal-info');
-var hidePaypalInfo = () => paypalInfo.style.display = "none";
+
+// Helper functions to show correct information
+var showCreditCardInfo = () => creditCardInfo.style.display = "block";
+var showBitcoinInfo = () => bitcoinInfo.style.display = "block";
 var showPaypalInfo = () => paypalInfo.style.display = "block";
+
+// hide all payment types
+var hideAllPaymentInfo = () => {
+  creditCardInfo.style.display = "none";
+  bitcoinInfo.style.display = "none";
+  paypalInfo.style.display = "none";
+}
+
+const paymentChoiceSelection = {
+  select_method: () => {
+    hideAllPaymentInfo();
+  },
+  credit_card: () => {
+    hideAllPaymentInfo();
+    showCreditCardInfo();
+  },
+  paypal: () => {
+    hideAllPaymentInfo();
+    showPaypalInfo();
+  },
+  bitcoin: () => {
+    hideAllPaymentInfo();
+    showBitcoinInfo();
+  }
+}
 
 // On payment choice, show the relevant divs of information and hide the rest.
 // If nothing is selected, hide all options.
 function onPaymentSelection() {
-  let selectedPayment = paymentChoice.selectedIndex;
-  if (selectedPayment === 0) {
-    hideCreditCardInfo();
-    hideBitcoinInfo();
-    hidePaypalInfo();
-  } else if (selectedPayment === 1) {
-    showCreditCardInfo();
-    hideBitcoinInfo();
-    hidePaypalInfo();
-  } else if (selectedPayment === 2) {
-    hideCreditCardInfo();
-    showPaypalInfo();
-    hideBitcoinInfo();
-  } else if (selectedPayment === 3) {
-    hideCreditCardInfo();
-    hidePaypalInfo();
-    showBitcoinInfo();
-  };
+  let selectedPayment = paymentChoice.options[paymentChoice.selectedIndex].value;
+  paymentChoiceSelection[selectedPayment]();
 };
 
 // Helper function to test if a string is all numbers for
@@ -304,27 +264,15 @@ const creditCardNumber = document.getElementById('cc-num');
 creditCardNumber.setAttribute("onkeyup", "validateCreditCardNumber()");
 creditCardNumber.setAttribute("onfocusout", "validateCreditCardNumber()");
 function validateCreditCardNumber() {
-  var ccFeedback = document.getElementsByClassName("form-error-cc-number");
-  if (ccFeedback.length > 0) {
-    ccFeedback[0].parentNode.removeChild(ccFeedback[0]);
-  };
+  removeExistingErrors('form-error-cc-number');
   let creditCardValue = creditCardNumber.value;
   let creditCardLength = creditCardValue.length;
   if (creditCardLength > 12 && creditCardLength < 17 && isANumber(creditCardValue)) {
     creditCardNumber.classList.remove("error");
   } else if (creditCardLength === 0) {
-    let creditNumberError = document.createElement('div');
-    creditNumberError.classList.add('form-error-cc','form-error-cc-number');
-    creditNumberError.textContent = 'Please enter your credit card number.'
-    creditCardNumber.parentNode.insertBefore(creditNumberError, creditCardNumber.nextSibling);
-    creditCardNumber.classList.add("error");
+    createErrorElement('form-error-cc','form-error-cc-number','Please enter your credit card number.', creditCardNumber, false)
   } else {
-    validationErrors += 1;
-    let creditNumberError = document.createElement('div');
-    creditNumberError.classList.add('form-error-cc','form-error-cc-number');
-    creditNumberError.textContent = 'Please enter a valid credit card number.'
-    creditCardNumber.parentNode.insertBefore(creditNumberError, creditCardNumber.nextSibling);
-    creditCardNumber.classList.add("error");
+    createErrorElement('form-error-cc','form-error-cc-number','Please enter a valid credit card number.', creditCardNumber, false)
   };
 };
 
@@ -332,21 +280,11 @@ const zipcode = document.getElementById('zip');
 zipcode.setAttribute("onkeyup", "validateZIP()");
 zipcode.setAttribute("onfocusout", "validateZIP()");
 function validateZIP() {
-  var ccFeedback = document.getElementsByClassName("form-error-cc-zip");
-  if (ccFeedback.length > 0) {
-    ccFeedback[0].parentNode.removeChild(ccFeedback[0]);
-  };
-  let zipcodeValue = zipcode.value
-  let zipcodeLength = zipcodeValue.length;
-  if (zipcodeLength === 5 && isANumber(zipcodeValue)) {
+  removeExistingErrors('form-error-cc-zip');
+  if (zipcode.value.length === 5 && isANumber(zipcode.value)) {
     zipcode.classList.remove("error");
   } else {
-    validationErrors += 1;
-    let creditZIPError = document.createElement('div');
-    creditZIPError.classList.add('form-error-cc','form-error-cc-zip');
-    creditZIPError.textContent = 'Please enter your ZIP code.';
-    creditCardNumber.parentNode.insertBefore(creditZIPError, creditCardNumber.nextSibling);
-    zipcode.classList.add("error");
+    createErrorElement('form-error-cc','form-error-cc-zip',"Please enter your ZIP code.", zipcode, false)
   };
 };
 
@@ -354,29 +292,15 @@ const cvv = document.getElementById('cvv');
 cvv.setAttribute("onkeyup", "validateCVV()");
 cvv.setAttribute("onfocusout", "validateCVV()");
 function validateCVV() {
-  var ccFeedback = document.getElementsByClassName("form-error-cc-cvv");
-  if (ccFeedback.length > 0) {
-    ccFeedback[0].parentNode.removeChild(ccFeedback[0]);
-  };
-  let cvvValue = cvv.value
+  removeExistingErrors('form-error-cc-cvv');
+  let cvvValue = cvv.value;
   let cvvLength = cvvValue.length;
   if (cvvLength === 3 && isANumber(cvvValue)) {
-    console.log('number!');
     cvv.classList.remove("error");
   } else if (cvvLength === 0) {
-    validationErrors += 1;
-    let creditCVVError = document.createElement('div');
-    creditCVVError.classList.add('form-error-cc','form-error-cc-cvv');
-    creditCVVError.textContent = 'Please enter your CVV code.';
-    creditCardNumber.parentNode.insertBefore(creditCVVError, creditCardNumber.nextSibling);
-    cvv.classList.add("error");
+    createErrorElement('form-error-cc','form-error-cc-cvv',"Please enter your CVV code.", cvv, false)
   } else {
-    validationErrors += 1;
-    let creditCVVError = document.createElement('div');
-    creditCVVError.classList.add('form-error-cc','form-error-cc-cvv');
-    creditCVVError.textContent = 'Please enter a valid CVV.';
-    creditCardNumber.parentNode.insertBefore(creditCVVError, creditCardNumber.nextSibling);
-    cvv.classList.add("error");
+    createErrorElement('form-error-cc','form-error-cc-cvv','Please enter a valid CVV.', cvv, false)
   };
 };
 
@@ -418,26 +342,20 @@ function formFeedbackFail() {
 // Upon form submission, validate form
 function submitForm() {
   event.preventDefault();
-  // reset validation errors
+  // reset validation errors, then validate each section
   validationErrors = 0;
-  // validate each portion
   validateName();
   validateEmail();
   validateJobRole();
   validateShirt();
   validateActivities();
   validateCreditCard();
-
+  // scroll to top where feedback will appear
   window.scrollTo(0,0);
-  var feedback = document.getElementsByClassName("form-feedback-message");
-  if (feedback.length > 0) {
-    feedback[0].parentNode.removeChild(feedback[0]);
-  };
+  removeExistingErrors("form-feedback-message");
   if (validationErrors > 0) {
-    console.log("no bueno!");
     formFeedbackFail();
   } else {
-    console.log("bueno!");
     formFeedbackSuccess();
   };
 };
@@ -446,9 +364,7 @@ function formReset() {
   form.reset();
   hideShirtColors();
   hideJobOtherField();
-  showCreditCardInfo();
-  hidePaypalInfo();
-  hideBitcoinInfo();
+  paymentChoiceSelection.credit_card();
   costTotal = 0;
   setCostTotal();
   for(var i=0; i< activityCheckboxes.length; i++) {
@@ -457,13 +373,33 @@ function formReset() {
 };
 
 /*
-  -- ON LOAD
-  Focuses text field an initiates default values.
+  ERROR HELPERS
+*/
+
+function createErrorElement(class1, class2, text, itemparent, before) {
+  validationErrors += 1;
+  errorMessage = document.createElement('div');
+  errorMessage.classList.add(class1,class2);
+  errorMessage.textContent = text;
+  if (before) {
+    itemparent.parentNode.insertBefore(errorMessage, itemparent);
+  } else {
+    itemparent.parentNode.insertBefore(errorMessage, itemparent.nextSibling);
+  };
+  itemparent.classList.add("error");
+};
+
+function removeExistingErrors(classname) {
+  var feedbackError = document.getElementsByClassName(classname);
+  if (feedbackError.length > 0) {
+    feedbackError[0].parentNode.removeChild(feedbackError[0]);
+  };
+}
+
+/*
+  -- ON LOAD - focuses text, sets up relevant fields
 */
 window.onload = function() {
   var input = document.getElementById("name").focus();
-  hideJobOtherField();
-  hideShirtColors();
-  hidePaypalInfo();
-  hideBitcoinInfo();
+  formReset();
 }

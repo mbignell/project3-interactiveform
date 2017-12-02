@@ -192,14 +192,6 @@ input.error {
   pointer-events: none;
 }
 
-.form-error-activities {
-  color: var(--errorcolor);
-  font-style: italic;
-  font-size: 14px;
-  font-weight: 500;
-  margin-top: 10px;
-}
-
 .form-error-cc {
   color: var(--errorcolor);
   font-style: italic;
@@ -207,6 +199,15 @@ input.error {
   font-weight: 500;
   display: block;
   width: 100%;
+}
+
+.form-error-activities {
+  color: var(--errorcolor);
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: -20px;
+  margin-bottom:20px
 }
 
 .clear {
