@@ -198,6 +198,8 @@ input.error {
   font-size: 14px;
   font-weight: 500;
   display: block;
+  margin-bottom:20px;
+  margin-top:-10px;
   width: 100%;
 }
 
