@@ -1,5 +1,5 @@
 // Sets up form elements as referencable objects
-// adds submission call
+// adds submission call, clears action
 // initiates validationErrors
 const form = document.getElementsByTagName('form')[0];
 const pageContainer = document.getElementsByClassName('container')[0];
@@ -7,55 +7,87 @@ form.setAttribute("onsubmit", "return submitForm()");
 form.setAttribute("action", "");
 let validationErrors = 0;
 
+const errorMessages = {
+  'name': 'Please add your name.',
+  'email': 'Please add your email.',
+  'jobOther': 'Please enter your job role.',
+  'shirt': 'Please select a shirt design.',
+  'activities': 'You must select at least one activity.',
+  'ccnumber': 'Please enter your credit card number.',
+  'cczipcode': 'Please enter a valid ZIP code.',
+  'cvv': 'Please enter a valid CVV.'
+}
+
+// Builds an error message using the string passed through.
+// If it's for name, email, or the other field, places it within the input.
+// Else, places it after.
+function createError(input) {
+  validationErrors += 1;
+  let errorParent = eval(input);
+  let error = document.createElement('div');
+  error.classList.add('form-error-' + input);
+  error.textContent = errorMessages[input];
+  if (input === 'name' || input === 'email' || input === 'jobOther') {
+    errorParent.parentNode.insertBefore(error, errorParent);
+  } else {
+    errorParent.parentNode.insertBefore(error, errorParent.nextSibling);
+  };
+  errorParent.classList.add("error");
+}
+// Removes any existing errors before re-validating
+function removeExistingErrors(classname) {
+  let feedbackError = document.getElementsByClassName(classname);
+  if (feedbackError.length > 0) {
+    feedbackError[0].parentNode.removeChild(feedbackError[0]);
+  };
+}
+
 /*
-  #1 -- NAME
+*  #1 -- NAME
+*  Adds javascript for email field validation
 */
-
-// Adds javascript action for name field
-const nameField = document.getElementById('name');
-nameField.setAttribute("onfocusout", "validateName()");
-
+const name = document.getElementById('name');
+name.setAttribute("onfocusout", "validateName()");
 function validateName() {
-  let nameValue = nameField.value;
+  let nameValue = name.value;
   removeExistingErrors('form-error-name');
   if (nameValue === '') {
-    createErrorElement('form-error', 'form-error-name','Please add a name.', nameField, true)
+    createError('name');
   } else {
-    nameField.classList.remove("error");
+    name.classList.remove("error");
   };
 };
 
 /*
-  #2 -- EMAIL
+*  #2 -- EMAIL
+*  Adds javascript for email field validation
 */
-
-// Adds javascript action for email field
-const emailField = document.getElementById('mail');
-emailField.setAttribute("onkeyup", "validateEmail()");
-emailField.setAttribute("onfocusout", "validateEmail()");
-
+const email = document.getElementById('mail');
+email.setAttribute("onkeyup", "validateEmail()");
+email.setAttribute("onfocusout", "validateEmail()");
 function validateEmail() {
-  var email = emailField.value;
-  var testterms = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  let emailValue = email.value;
+  const testterms = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   removeExistingErrors('form-error-email');
-  if (testterms.test(email)) {
-    emailField.classList.remove("error");
-  } else if (email === ''){
-    createErrorElement('form-error','form-error-email','Please add your email.', emailField, true)
+  if (testterms.test(emailValue)) {
+    email.classList.remove("error");
+  } else if (emailValue === ''){
+    errorMessages.email = 'Please enter an email.';
+    createError('email');
   } else {
-    createErrorElement('form-error','form-error-email','Please enter a valid email.', emailField, true)
+    errorMessages.email = 'Please enter a valid email.';
+    createError('email');
   };
 };
 
 /*
-  #3 -- JOB ROLE
+*  #3 -- JOB ROLE
 */
-
 // Adds javascript to job selection dropdown and collects necessary objects
 const otherFieldContainer = document.getElementById('job-other-container');
-const otherField = document.getElementById('other-job');
-otherField.setAttribute("onfocusout", "validateJobRole()");
-otherField.setAttribute("onkeypress", "validateJobRole()");
+const jobOther = document.getElementById('other-job');
+jobOther.setAttribute("onfocusout", "validateJobRole()");
+jobOther.setAttribute("onkeypress", "validateJobRole()");
 const jobFields = document.getElementById('title');
 jobFields.setAttribute("onchange", "onJobSelection()");
 
@@ -70,39 +102,37 @@ function onJobSelection() {
     showJobOtherField();
   } else {
     hideJobOtherField();
-    otherField.classList.remove("error");
+    jobOther.classList.remove("error");
   }
 };
 
 // If "other" is selected, make sure they've added a job role
 function validateJobRole() {
-  removeExistingErrors('form-error-job');
+  removeExistingErrors('form-error-jobOther');
   const finalJobValue = jobFields.options[jobFields.selectedIndex].value;
-  if (finalJobValue === "other" && otherField.value === '') {
-    createErrorElement('form-error', 'form-error-job','Please add your role.', otherField, true)
+  if (finalJobValue === "other" && jobOther.value === '') {
+    createError('jobOther')
   } else {
-    otherField.classList.remove("error");
+    jobOther.classList.remove("error");
   }
 };
 
 /*
   #4 -- SHIRT CHOICE
 */
-
 // Adds javascript action for shirt choice
-const shirtChoice = document.getElementById('design');
-shirtChoice.setAttribute("onchange", "onShirtDesignSelection()");
+const shirt = document.getElementById('design');
+shirt.setAttribute("onchange", "onShirtDesignSelection()");
 
 // Helpers for hiding or showing shirt colors
 const shirtColor = document.getElementById('colors-js-puns');
 const hideShirtColors = () => shirtColor.style.display = "none";
 const showShirtColors = () => shirtColor.style.display = "block";
-
 const shirtTitle = document.getElementsByClassName('shirt')[0].nextSibling;
 
 // When design is selected, show relevant color choices
 function onShirtDesignSelection() {
-  const selectedDesignIndex = shirtChoice.selectedIndex;
+  const selectedDesignIndex = shirt.selectedIndex;
   const colorChoices = document.getElementById('color');
   let colorChoicesHTML;
   if (selectedDesignIndex === 0) {
@@ -123,23 +153,22 @@ function onShirtDesignSelection() {
 
 function validateShirt() {
   removeExistingErrors('form-error-shirt');
-  const selectedDesignIndex = shirtChoice.selectedIndex;
+  const selectedDesignIndex = shirt.selectedIndex;
   if (selectedDesignIndex === 0) {
-    createErrorElement('form-error-cc', 'form-error-shirt','Please select a shirt design.', shirtChoice, false);
+    createError('shirt');
   };
 };
 
 /*
   #5 -- ACTIVITIES
 */
-
 // Adds javascript action for activity selection
 const activityFieldSet = document.getElementsByClassName('activities')[0];
 const activityCheckboxes = activityFieldSet.getElementsByTagName('input');
 for(let i=0; i< activityCheckboxes.length; i++) {
   activityCheckboxes[i].setAttribute("onchange", `onActivitySelection(this,${i})`);
 };
-const activityTitle = activityFieldSet.getElementsByTagName('legend')[0];
+const activities = activityFieldSet.getElementsByTagName('legend')[0];
 
 // initiates cost at 0
 let costTotal = 0;
@@ -199,14 +228,13 @@ function setCostTotal() {
 function validateActivities() {
   removeExistingErrors('form-error-activities');
   if (costTotal === 0) {
-    createErrorElement('form-error-activities','none','You must select at least one activity.', activityTitle, false);
+    createError('activities');
   };
 };
 
 /*
   #6 -- PAYMENT
 */
-
 // Adds javascript action for payment choice
 const paymentChoice = document.getElementById('payment');
 paymentChoice.setAttribute("onchange", "onPaymentSelection()");
@@ -217,12 +245,12 @@ const bitcoinInfo = document.getElementById('bitcoin-info');
 const paypalInfo = document.getElementById('paypal-info');
 
 // Helper functions to show correct information
-var showCreditCardInfo = () => creditCardInfo.style.display = "block";
-var showBitcoinInfo = () => bitcoinInfo.style.display = "block";
-var showPaypalInfo = () => paypalInfo.style.display = "block";
+const showCreditCardInfo = () => creditCardInfo.style.display = "block";
+const showBitcoinInfo = () => bitcoinInfo.style.display = "block";
+const showPaypalInfo = () => paypalInfo.style.display = "block";
 
 // hide all payment types
-var hideAllPaymentInfo = () => {
+const hideAllPaymentInfo = () => {
   creditCardInfo.style.display = "none";
   bitcoinInfo.style.display = "none";
   paypalInfo.style.display = "none";
@@ -253,38 +281,37 @@ function onPaymentSelection() {
   paymentChoiceSelection[selectedPayment]();
 };
 
-// Helper function to test if a string is all numbers for
-// credit card, zipcode, and cvv use.
-function isANumber(str){
-  return !/\D/.test(str);
-}
+// Helper function to test if a string is all numbers (credit card validation)
+const isANumber = (str) => { return !/\D/.test(str); }
 
 // Credit Card Number Validation
-const creditCardNumber = document.getElementById('cc-num');
-creditCardNumber.setAttribute("onkeyup", "validateCreditCardNumber()");
-creditCardNumber.setAttribute("onfocusout", "validateCreditCardNumber()");
+const ccnumber = document.getElementById('cc-num');
+ccnumber.setAttribute("onkeyup", "validateCreditCardNumber()");
+ccnumber.setAttribute("onfocusout", "validateCreditCardNumber()");
 function validateCreditCardNumber() {
-  removeExistingErrors('form-error-cc-number');
-  let creditCardValue = creditCardNumber.value;
+  removeExistingErrors('form-error-ccnumber');
+  let creditCardValue = ccnumber.value;
   let creditCardLength = creditCardValue.length;
   if (creditCardLength > 12 && creditCardLength < 17 && isANumber(creditCardValue)) {
-    creditCardNumber.classList.remove("error");
+    ccnumber.classList.remove("error");
   } else if (creditCardLength === 0) {
-    createErrorElement('form-error-cc','form-error-cc-number','Please enter your credit card number.', creditCardNumber, false)
+    errorMessages.ccnumber = 'Please enter your credit card number.';
+    createError('ccnumber');
   } else {
-    createErrorElement('form-error-cc','form-error-cc-number','Please enter a valid credit card number.', creditCardNumber, false)
+    errorMessages.ccnumber = 'Please enter a valid credit card number';
+    createError('ccnumber');
   };
 };
 
-const zipcode = document.getElementById('zip');
-zipcode.setAttribute("onkeyup", "validateZIP()");
-zipcode.setAttribute("onfocusout", "validateZIP()");
+const cczipcode = document.getElementById('zip');
+cczipcode.setAttribute("onkeyup", "validateZIP()");
+cczipcode.setAttribute("onfocusout", "validateZIP()");
 function validateZIP() {
-  removeExistingErrors('form-error-cc-zip');
-  if (zipcode.value.length === 5 && isANumber(zipcode.value)) {
-    zipcode.classList.remove("error");
+  removeExistingErrors('form-error-cczipcode');
+  if (cczipcode.value.length === 5 && isANumber(cczipcode.value)) {
+    cczipcode.classList.remove("error");
   } else {
-    createErrorElement('form-error-cc','form-error-cc-zip',"Please enter your ZIP code.", zipcode, false)
+    createError('cczipcode');
   };
 };
 
@@ -292,15 +319,15 @@ const cvv = document.getElementById('cvv');
 cvv.setAttribute("onkeyup", "validateCVV()");
 cvv.setAttribute("onfocusout", "validateCVV()");
 function validateCVV() {
-  removeExistingErrors('form-error-cc-cvv');
-  let cvvValue = cvv.value;
-  let cvvLength = cvvValue.length;
-  if (cvvLength === 3 && isANumber(cvvValue)) {
+  removeExistingErrors('form-error-cvv');
+  if (cvv.value.length === 3 && isANumber(cvv.value)) {
     cvv.classList.remove("error");
-  } else if (cvvLength === 0) {
-    createErrorElement('form-error-cc','form-error-cc-cvv',"Please enter your CVV code.", cvv, false)
+  } else if (cvv.value.length === 0) {
+    errorMessages.cvv = 'Please enter your CVV.';
+    createError('cvv');
   } else {
-    createErrorElement('form-error-cc','form-error-cc-cvv','Please enter a valid CVV.', cvv, false)
+    errorMessages.cvv = 'Please enter a valid CVV.';
+    createError('cvv');
   };
 };
 
@@ -316,24 +343,19 @@ function validateCreditCard() {
 /*
   -- FORM SUBMISSION
 */
-
 // Functions for form feedback/reset
 function formFeedbackSuccess() {
   let feedbackContainer = document.createElement('div');
   feedbackContainer.classList.add('form-feedback-message');
-
   formReset();
-
   feedbackContainer.innerHTML = `<strong>Awesome!</strong> ` +
   `We're excited to have you at Full Stack Conf! See you soon!`;
-
   pageContainer.insertBefore(feedbackContainer, form);
 }
 
 function formFeedbackFail() {
   let feedbackContainer = document.createElement('div');
-  feedbackContainer.classList.add('form-feedback-message');
-  feedbackContainer.classList.add('form-invalid');
+  feedbackContainer.classList.add('form-feedback-message','form-invalid');
   feedbackContainer.innerHTML = `<strong>Bummer!</strong> ` +
   `One or more of the form fields are invalid. Please correct your errors and resubmit the form.`;
   pageContainer.insertBefore(feedbackContainer, form);
@@ -367,39 +389,15 @@ function formReset() {
   paymentChoiceSelection.credit_card();
   costTotal = 0;
   setCostTotal();
-  for(var i=0; i< activityCheckboxes.length; i++) {
+  for(let i=0; i< activityCheckboxes.length; i++) {
     activityCheckboxes[i].disabled = false;
   };
 };
 
 /*
-  ERROR HELPERS
-*/
-
-function createErrorElement(class1, class2, text, itemparent, before) {
-  validationErrors += 1;
-  errorMessage = document.createElement('div');
-  errorMessage.classList.add(class1,class2);
-  errorMessage.textContent = text;
-  if (before) {
-    itemparent.parentNode.insertBefore(errorMessage, itemparent);
-  } else {
-    itemparent.parentNode.insertBefore(errorMessage, itemparent.nextSibling);
-  };
-  itemparent.classList.add("error");
-};
-
-function removeExistingErrors(classname) {
-  var feedbackError = document.getElementsByClassName(classname);
-  if (feedbackError.length > 0) {
-    feedbackError[0].parentNode.removeChild(feedbackError[0]);
-  };
-}
-
-/*
   -- ON LOAD - focuses text, sets up relevant fields
 */
 window.onload = function() {
-  var input = document.getElementById("name").focus();
+  let input = document.getElementById("name").focus();
   formReset();
 }

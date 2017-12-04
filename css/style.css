@@ -135,6 +135,12 @@ button:hover {
 	float: left;
 	margin-right: .85em;
 }
+.shirt div:nth-of-type(2){
+  width: 127px;
+}
+.shirt select {
+  margin-bottom: 20px;
+}
 
 .interests input {
 	margin-bottom: 0;
@@ -179,7 +185,9 @@ input.error {
   border-color: var(--errorcolor);
 }
 
-.form-error {
+.form-error-name,
+.form-error-email,
+.form-error-jobOther {
   color: var(--errorcolor);
   font-style: italic;
   font-size: 14px;
@@ -192,13 +200,16 @@ input.error {
   pointer-events: none;
 }
 
-.form-error-cc {
+.form-error-ccnumber,
+.form-error-cczipcode,
+.form-error-cvv,
+.form-error-shirt {
   color: var(--errorcolor);
   font-style: italic;
   font-size: 14px;
   font-weight: 500;
   display: block;
-  margin-bottom:20px;
+  margin-bottom:10px;
   margin-top:-10px;
   width: 100%;
 }
